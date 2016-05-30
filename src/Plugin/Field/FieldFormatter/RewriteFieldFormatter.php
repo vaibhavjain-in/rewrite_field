@@ -25,7 +25,8 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   },
  *   settings = {
  *     "prefix" = "",
- *     "suffix" = ""
+ *     "suffix" = "",
+ *     "custom_text" = ""
  *   }
  * )
  */
@@ -38,6 +39,7 @@ class RewriteFieldFormatter extends FormatterBase {
     return array(
       'prefix' => '',
       'suffix' => '',
+      'custom_text' => '',
     ) + parent::defaultSettings();
   }
 
@@ -62,6 +64,13 @@ class RewriteFieldFormatter extends FormatterBase {
       '#default_value' => $this->settings['suffix'],
     );
 
+    $element['custom_text'] = array(
+      '#title' => t('Custom Text'),
+      '#type' => 'textarea',
+      '#description' => t('Override the output of this field with custom text'),
+      '#default_value' => $this->settings['custom_text'],
+    );
+
     return $element;
   }
 
@@ -72,9 +81,18 @@ class RewriteFieldFormatter extends FormatterBase {
     $elements = array();
     $prefix = $this->settings['prefix'];
     $suffix = $this->settings['suffix'];
-
+    $custom_text = $this->settings['custom_text'];
     foreach ($items as $delta => $item) {
-      $output = $prefix . $item->value . $suffix;
+      $output = $item->value;
+      if (!empty($custom_text)) {
+        $output = $custom_text;
+      }
+      if (!empty($prefix)) {
+        $output = $prefix . $output;
+      }
+      if (!empty($suffix)) {
+        $output = $output . $suffix;
+      }
       $elements[$delta] = [
         '#markup' => $output];
     }
