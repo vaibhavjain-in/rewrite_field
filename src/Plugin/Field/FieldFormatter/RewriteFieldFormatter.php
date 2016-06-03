@@ -173,9 +173,6 @@ class RewriteFieldFormatter extends FormatterBase {
       if (!empty($output) && !empty($custom_text)) {
         $output = $custom_text;
       }
-      else {
-        // @todo: Add No Results Behaviour
-      }
       if ($text_case != 'none') {
         $output = Unicode::$text_case($output);
       }
