@@ -195,7 +195,7 @@ class RewriteFieldFormatter extends FormatterBase {
   /**
    * Generate the output as a link, with inputs from user.
    */
-  private function makeLink($link_path, $output) {
+  protected function makeLink($link_path, $output) {
     $link_options = array();
     if (!empty($this->settings['link_options'])) {
       $link_options = $this->createArray($this->settings['link_options']);
@@ -219,7 +219,7 @@ class RewriteFieldFormatter extends FormatterBase {
   /**
    * Create the array, parsable to core methods.
    */
-  private function createArray($string) {
+  protected function createArray($string) {
     $values = array();
     $explodedValues = explode(',', $string);
     foreach ($explodedValues as $explodedValue) {
