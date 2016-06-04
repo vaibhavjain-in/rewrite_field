@@ -66,34 +66,34 @@ class RewriteFieldFormatter extends FormatterBase {
     $element = parent::settingsForm($form, $form_state);
 
     $element['prefix'] = array(
-      '#title' => t('Prefix'),
+      '#title' => $this->t('Prefix'),
       '#type' => 'textfield',
       '#size' => 20,
       '#default_value' => $this->settings['prefix'],
     );
 
     $element['suffix'] = array(
-      '#title' => t('Suffix'),
+      '#title' => $this->t('Suffix'),
       '#type' => 'textfield',
       '#size' => 20,
       '#default_value' => $this->settings['suffix'],
     );
 
     $element['custom_text'] = array(
-      '#title' => t('Custom Text'),
+      '#title' => $this->t('Custom Text'),
       '#type' => 'textarea',
-      '#description' => t('Override the output of this field with custom text'),
+      '#description' => $this->t('Override the output of this field with custom text'),
       '#default_value' => $this->settings['custom_text'],
     );
 
     $element['make_link'] = array(
-      '#title' => t('Output this field as a custom link'),
+      '#title' => $this->t('Output this field as a custom link'),
       '#type' => 'checkbox',
       '#default_value' => $this->settings['make_link'],
     );
 
     $element['link_path'] = array(
-      '#title' => t('Link path'),
+      '#title' => $this->t('Link path'),
       '#type' => 'textfield',
       '#default_value' => $this->settings['link_path'],
       '#description' => $this->t('The Drupal path (/node) or absolute URL (http://www.example.com) for this link.'),
@@ -107,7 +107,7 @@ class RewriteFieldFormatter extends FormatterBase {
 
     $element['external_link'] = array(
       '#type' => 'checkbox',
-      '#title' => t('External URL'),
+      '#title' => $this->t('External URL'),
       '#default_value' => $this->settings['external_link'],
       '#description' => $this->t("A link to external server: e.g. 'http://www.example.com' or 'www.example.com'."),
       '#states' => array(
@@ -119,7 +119,7 @@ class RewriteFieldFormatter extends FormatterBase {
 
     $element['link_options'] = array(
       '#type' => 'textfield',
-      '#title' => t('Link Options'),
+      '#title' => $this->t('Link Options'),
       '#default_value' => $this->settings['link_options'],
       '#description' => $this->t("Comma seperated list of options. Like, query=key|value,fragment=1234,absolute=true"),
       '#states' => array(
@@ -131,7 +131,7 @@ class RewriteFieldFormatter extends FormatterBase {
 
     $element['link_attributes'] = array(
       '#type' => 'textfield',
-      '#title' => t('Link Attributes'),
+      '#title' => $this->t('Link Attributes'),
       '#default_value' => $this->settings['link_attributes'],
       '#description' => $this->t("Comma seperated list of attributes. Like, class=myClass1 myClass2,rel=lightbox,target=_blank"),
       '#states' => array(
