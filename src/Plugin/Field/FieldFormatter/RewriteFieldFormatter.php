@@ -8,11 +8,15 @@
 namespace Drupal\rewrite_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\rewrite_field\TransformCaseManager;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'prefix_suffix' formatter.
@@ -39,7 +43,14 @@ use Drupal\Component\Utility\Unicode;
  *   }
  * )
  */
-class RewriteFieldFormatter extends FormatterBase {
+class RewriteFieldFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Transform case plugin manager.
+   *
+   * @var \Drupal\rewrite_field\TransformCaseManager
+   */
+  protected $transformCaseManager;
 
   /**
    * {@inheritdoc}
@@ -58,6 +69,26 @@ class RewriteFieldFormatter extends FormatterBase {
     ) + parent::defaultSettings();
   }
 
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, TransformCaseManager $transform_case_manager) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+    $this->transformCaseManager = $transform_case_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('rewrite_field.transform_manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -141,17 +172,16 @@ class RewriteFieldFormatter extends FormatterBase {
       ),
     );
 
+    $plugin_definitions = $this->transformCaseManager->getDefinitions();
+    $plugins = array();
+    foreach ($plugin_definitions as $plugin_id => $plugin) {
+      $plugins[$plugin_id] = $plugin['title'];
+    }
     $element['text_case'] = array(
       '#type' => 'select',
       '#title' => $this->t('Transform the text case'),
       '#description' => $this->t('Transform the case of the text.'),
-      '#options' => array(
-        'none' => $this->t('No transform'),
-        'strtoupper' => $this->t('Upper case'),
-        'strtolower' => $this->t('Lower case'),
-        'ucfirst' => $this->t('Capitalize first letter'),
-        'ucwords' => $this->t('Capitalize each word'),
-      ),
+      '#options' => ['none' => t('No Transform')] + $plugins,
       '#default_value' => $this->settings['text_case'],
     );
 
@@ -174,7 +204,8 @@ class RewriteFieldFormatter extends FormatterBase {
         $output = $custom_text;
       }
       if ($text_case != 'none') {
-        $output = Unicode::$text_case($output);
+        $plugin = $this->transformCaseManager->getDefinition($text_case);
+        $output = $plugin['class']::transform($output);
       }
       if ($this->settings['make_link'] && !empty($link_path)) {
         $output = $this->makeLink($link_path, $output);
